@@ -1,0 +1,193 @@
+import { ProofCard } from '@/types';
+
+export const PROOF_CARDS: ProofCard[] = [
+  {
+    id: 'age_over_18',
+    title: 'Age Verification',
+    description: 'Prove you are 18+ without revealing your birthdate',
+    icon: '🔞',
+    color: 'purple',
+    fields: [
+      {
+        key: 'birthdate',
+        label: 'Date of Birth',
+        placeholder: 'YYYY-MM-DD',
+        type: 'date',
+        hint: 'Your birthdate stays private. Only the proof is shared.',
+      },
+    ],
+  },
+  {
+    id: 'accredited_investor',
+    title: 'Accredited Investor',
+    description: 'Prove net worth exceeds threshold without revealing exact amount',
+    icon: '💎',
+    color: 'cyan',
+    fields: [
+      {
+        key: 'netWorth',
+        label: 'Net Worth (USD cents)',
+        placeholder: '100000000',
+        type: 'number',
+        hint: 'Enter your net worth in cents. E.g. $1,000,000 = 100000000',
+      },
+      {
+        key: 'threshold',
+        label: 'Minimum Threshold (USD cents)',
+        placeholder: '100000000',
+        type: 'number',
+        hint: 'Default: $1,000,000 threshold for accredited investor status',
+      },
+    ],
+  },
+  {
+    id: 'credit_score_range',
+    title: 'Credit Score',
+    description: 'Prove your credit score meets minimum without revealing the exact score',
+    icon: '📊',
+    color: 'green',
+    fields: [
+      {
+        key: 'creditScore',
+        label: 'Your Credit Score',
+        placeholder: '750',
+        type: 'number',
+        hint: 'Must be between 300 and 850',
+      },
+      {
+        key: 'minimumScore',
+        label: 'Minimum Required Score',
+        placeholder: '650',
+        type: 'number',
+        hint: 'The minimum score required by the verifier',
+      },
+    ],
+  },
+  {
+    id: 'jurisdiction_check',
+    title: 'Jurisdiction Check',
+    description: 'Prove you are from an allowed jurisdiction privately',
+    icon: '🌍',
+    color: 'blue',
+    fields: [
+      {
+        key: 'countryCode',
+        label: 'Your Country Code (numeric)',
+        placeholder: '840',
+        type: 'number',
+        hint: 'ISO 3166-1 numeric code. E.g. US = 840, GB = 826, NG = 566',
+      },
+      {
+        key: 'allowedCountryCode',
+        label: 'Allowed Country Code',
+        placeholder: '840',
+        type: 'number',
+        hint: 'The country code that is permitted',
+      },
+    ],
+  },
+  {
+    id: 'source_of_funds',
+    title: 'Source of Funds',
+    description: 'Prove compliance with source-of-funds policy without revealing transaction history',
+    icon: '🏦',
+    color: 'violet',
+    fields: [
+      {
+        key: 'transactionHistoryHash',
+        label: 'Transaction History Hash',
+        placeholder: '12345678',
+        type: 'number',
+        hint: 'Poseidon hash of your transaction history',
+      },
+      {
+        key: 'compliancePolicyHash',
+        label: 'Compliance Policy Hash',
+        placeholder: '87654321',
+        type: 'number',
+        hint: 'Hash of the compliance policy to verify against',
+      },
+    ],
+  },
+  {
+    id: 'sanctions_check',
+    title: 'Sanctions Check',
+    description: 'Prove you are not on any sanctions list without revealing your identity',
+    icon: '🛡️',
+    color: 'red',
+    fields: [
+      {
+        key: 'identityHash',
+        label: 'Identity Hash',
+        placeholder: '99999999',
+        type: 'number',
+        hint: 'Poseidon hash of your identity credentials',
+      },
+      {
+        key: 'merkleRoot',
+        label: 'Sanctions Merkle Root',
+        placeholder: '0',
+        type: 'number',
+        hint: 'Root of the current sanctions list Merkle tree',
+      },
+      {
+        key: 'pathNumber',
+        label: 'Path Number',
+        placeholder: '0',
+        type: 'number',
+        hint: 'Your position in the Merkle tree (identityHash mod 1024)',
+      },
+    ],
+  },
+];
+
+export const COLOR_MAP: Record<string, Record<string, string>> = {
+  purple: {
+    border: 'border-stellar-purple/30',
+    hover: 'hover:border-stellar-purple/70',
+    glow: 'hover:shadow-[0_0_30px_rgba(123,47,255,0.3)]',
+    badge: 'bg-stellar-purple/20 text-purple-300 border-stellar-purple/30',
+    button: 'bg-stellar-purple hover:bg-purple-600',
+    icon: 'text-stellar-purple',
+  },
+  cyan: {
+    border: 'border-stellar-cyan/30',
+    hover: 'hover:border-stellar-cyan/70',
+    glow: 'hover:shadow-[0_0_30px_rgba(6,182,212,0.3)]',
+    badge: 'bg-stellar-cyan/20 text-cyan-300 border-stellar-cyan/30',
+    button: 'bg-stellar-cyan hover:bg-cyan-500',
+    icon: 'text-stellar-cyan',
+  },
+  green: {
+    border: 'border-stellar-green/30',
+    hover: 'hover:border-stellar-green/70',
+    glow: 'hover:shadow-[0_0_30px_rgba(16,185,129,0.3)]',
+    badge: 'bg-stellar-green/20 text-green-300 border-stellar-green/30',
+    button: 'bg-stellar-green hover:bg-green-500',
+    icon: 'text-stellar-green',
+  },
+  blue: {
+    border: 'border-stellar-blue/30',
+    hover: 'hover:border-stellar-blue/70',
+    glow: 'hover:shadow-[0_0_30px_rgba(37,99,235,0.3)]',
+    badge: 'bg-stellar-blue/20 text-blue-300 border-stellar-blue/30',
+    button: 'bg-stellar-blue hover:bg-blue-500',
+    icon: 'text-stellar-blue',
+  },
+  violet: {
+    border: 'border-violet-500/30',
+    hover: 'hover:border-violet-500/70',
+    glow: 'hover:shadow-[0_0_30px_rgba(139,92,246,0.3)]',
+    badge: 'bg-violet-500/20 text-violet-300 border-violet-500/30',
+    button: 'bg-violet-600 hover:bg-violet-500',
+    icon: 'text-violet-400',
+  },
+  red: {
+    border: 'border-stellar-red/30',
+    hover: 'hover:border-stellar-red/70',
+    glow: 'hover:shadow-[0_0_30px_rgba(239,68,68,0.3)]',
+    badge: 'bg-stellar-red/20 text-red-300 border-stellar-red/30',
+    button: 'bg-stellar-red hover:bg-red-500',
+    icon: 'text-stellar-red',
+  },
+};
