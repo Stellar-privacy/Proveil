@@ -1,0 +1,18 @@
+# Build artifacts (regenerable via circom + snarkjs)
+build/
+*_js/
+
+# Trusted setup ceremony files (large, regenerable)
+*.ptau
+*.zkey
+
+# Circuit compilation outputs
+*.r1cs
+*.sym
+
+# Node
+node_modules/
+package-lock.json
+
+# Witness files
+*.wtns
