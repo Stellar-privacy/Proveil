@@ -1,0 +1,7 @@
+[workspace]
+members = [
+  "verifier",
+  "registry",
+  "revocation"
+]
+resolver = "2"
