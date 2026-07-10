@@ -1,17 +1,46 @@
-# OS
+# Dependencies
+node_modules/
+
+# Environment files (NEVER commit these)
+.env
+.env.local
+.env.production
+
+# Build outputs
+dist/
+build/
+.next/
+
+# Rust build artifacts
+target/
+
+# ZKey files (large binary files)
+*.zkey
+
+# PTAU files (large binary files)
+*.ptau
+
+# snarkjs witness files
+*.wtns
+
+# Next.js generated
+next-env.d.ts
+*.tsbuildinfo
+
+# OS files
 .DS_Store
 Thumbs.db
 
-# Editor
+# IDE
 .vscode/
 .idea/
-*.swp
-*.swo
 
-# Environment
-.env
-.env.local
-.env.*.local
-
-# Kilo
+# Kilo editor
 .kilo/
+
+# Logs
+*.log
+npm-debug.log*
+
+# Lock files in subdirectories
+circuits/package-lock.json
