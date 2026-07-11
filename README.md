@@ -1,127 +1,242 @@
-# Proveil
+# ProVeil
 
-Privacy-Preserving KYC/AML Verification Infrastructure for Stellar.
+> Privacy-preserving KYC compliance using zero-knowledge proofs on Stellar
 
-Based on Stellar Protocol 25 (X-Ray), with BN254 elliptic curve and Poseidon hash support available as Soroban host functions.
+ProVeil lets users prove compliance statements — age, accredited investor status, credit score, jurisdiction, source of funds, sanctions clearance — without revealing the underlying private data. Proofs are generated using Groth16 circuits and attested immutably on Stellar testnet via a Soroban smart contract.
 
-## Project Goal
+**Live contract:** `CDA7HN45XE3EDAJJZQ4HBYM5E6G6SYIJZJIRPKQSMBLTDQAAXNEK76VQ`
+**Network:** Stellar Testnet
+**ZK Framework:** Circom + SnarkJS (Groth16, BN254)
 
-Proveil provides a zero-knowledge compliance stack so users can prove regulatory properties (like age or sanctions non-membership) without revealing underlying personal data.
+---
 
-## Core Stack
+## How It Works
 
-- **Stellar + Soroban** for on-chain verification and credential state.
-- **Circom** for zero-knowledge circuit definitions.
-- **SnarkJS** for off-chain proving and local verification workflows.
-- **Rust** for Soroban smart contracts.
-- **TypeScript/Node.js** for API, SDK, and CLI surfaces.
-- **Next.js** for the developer dashboard.
+1. User enters private data in the browser (birthdate, net worth, credit score, etc.)
+2. A Groth16 ZK circuit generates a cryptographic proof locally
+3. The proof is verified off-chain using snarkjs
+4. The verified result is attested on-chain via the Soroban verifier contract
+5. Anyone can query the contract to check if a wallet holds a valid attestation
 
-## Monorepo Structure
+Private data never leaves the user's machine. Only the proof and public signals are transmitted.
 
-```text
-proveil/
-├── circuits/          # Circom ZK circuits
-├── contracts/         # Soroban smart contracts (Rust)
-├── sdk/               # JavaScript/TypeScript SDK
-├── api/               # Backend API server (Node.js)
-├── dashboard/         # React/Next.js developer dashboard
-├── cli/               # CLI tool
-└── docs/              # Documentation
+---
+
+## Proof Types
+
+| Proof | Private Input | Public Input | Constraints |
+|-------|--------------|--------------|-------------|
+| Age 18+ | Birthdate | Current timestamp | 65 |
+| Accredited Investor | Net worth | Threshold ($1M) | 65 |
+| Credit Score Range | Credit score | Minimum score | 329 |
+| Jurisdiction Check | Country code | Allowed code | 2 |
+| Source of Funds | Tx history hash + salt | Policy hash | 245 |
+| Sanctions Check | Identity hash | Merkle root + path | 2715 |
+
+---
+
+## Architecture
+
+```
+┌─────────────────┐     ┌──────────────────┐     ┌─────────────────────┐
+│   Next.js UI    │────▶│  Express API     │────▶│  Stellar Testnet    │
+│  (Port 3000)    │     │  (Port 3001)     │     │  Soroban Contract   │
+└─────────────────┘     └──────────────────┘     └─────────────────────┘
+         │                       │
+         │                       ▼
+         │              ┌──────────────────┐
+         │              │  Circom Circuits  │
+         │              │  SnarkJS Groth16  │
+         └─────────────▶│  6 ZK Circuits   │
+                        └──────────────────┘
 ```
 
-## Build Phases (Roadmap Summary)
+### Stack
 
-### Phase 0 — Environment Setup
+- **ZK Circuits:** Circom 2.2.3, SnarkJS 0.7.6, Groth16, BN254
+- **Smart Contract:** Rust, Soroban SDK 22.0.0, Stellar CLI 27.0.0
+- **API:** Node.js, Express, TypeScript
+- **Frontend:** Next.js, React, TailwindCSS, Framer Motion
 
-Install Rust, Soroban CLI, Node.js (18+), SnarkJS, Circom, and optional RISC Zero tooling. Configure Stellar testnet keys and scaffold the monorepo.
+---
 
-### Phase 1 — ZK Circuit Development
+## Repository Structure
 
-Create proof circuits, beginning with `age_over_18.circom`, then sanctions and additional compliance templates.
+```
+Proveil/
+├── circuits/              # Circom ZK circuits + build artifacts
+│   ├── age_over_18.circom
+│   ├── accredited_investor.circom
+│   ├── credit_score_range.circom
+│   ├── jurisdiction_check.circom
+│   ├── source_of_funds.circom
+│   ├── sanctions_check.circom
+│   └── build/             # Compiled wasm + verification keys
+├── contracts/
+│   └── proveil-verifier/  # Soroban smart contract (Rust)
+│       └── src/lib.rs
+├── api/                   # Express API server (TypeScript)
+│   └── src/
+│       ├── services/      # proof.service.ts, stellar.service.ts
+│       ├── routes/        # proof.routes.ts
+│       └── middleware/    # validate.ts
+├── dashboard/             # Next.js frontend
+│   └── src/
+│       ├── app/           # layout.tsx, page.tsx
+│       ├── components/    # 8 UI components
+│       └── lib/           # api.ts, proofConfig.ts
+└── docs/
+```
 
-Target proof templates include:
+---
 
-- `age_over_18.circom`
-- `sanctions_check.circom`
-- `accredited_investor.circom`
-- `credit_score_range.circom`
-- `jurisdiction_check.circom`
-- `source_of_funds.circom`
+## Smart Contract
 
-Compile circuits and generate proving/verification artifacts using Circom + SnarkJS.
+The Soroban verifier contract stores attestation results on-chain with:
+- **30-day TTL** — verifications expire automatically
+- **Trusted verifier model** — only the authorized verifier address can attest
+- **SHA-256 commitments** — public signals hashed for audit trail
+- **6 proof types** supported natively
 
-### Phase 2 — Soroban Smart Contracts
+Key functions:
+```rust
+// Attest a verified proof result
+verify_proof(verifier, wallet, proof_type, public_signals) -> bool
 
-Implement three contracts:
+// Check if wallet holds active verification
+is_verified(wallet, proof_type) -> bool
 
-- **Verifier** contract for on-chain BN254 proof verification.
-- **Credential Registry** contract for proof-hash credential records.
-- **Revocation** contract for issuer-driven credential revocation checks.
+// Get full attestation record
+get_record(wallet, proof_type) -> Option
+```
 
-Deploy to Stellar testnet and capture contract IDs for SDK/API integration.
+---
 
-### Phase 3 — Proof Generation API
+## Running Locally
 
-Implement backend endpoints for proof generation, verification submission flow, and wallet credential retrieval.
+### Prerequisites
 
-Design requirement: private inputs must not be logged, stored, or persisted beyond proof generation.
+- Node.js 20+
+- Rust + Cargo
+- Circom 2.2.3
+- SnarkJS 0.7.6
+- Stellar CLI 27.0.0
 
-### Phase 4 — Developer SDK
+### 1. Circuits
 
-Provide TypeScript SDK APIs for:
+```bash
+cd circuits
+npm install          # installs circomlib
+# Build artifacts already committed in circuits/build/
+```
 
-- `generateProof(...)`
-- `verify(...)`
+### 2. Smart Contract
 
-Then extend packaging for Python, Rust, and Go wrappers in later phases.
+```bash
+cd contracts/proveil-verifier
+cargo test           # run 4 contract tests
+cargo build --target wasm32-unknown-unknown --release
+```
 
-### Phase 5 — Developer Dashboard
+### 3. API
 
-Build Next.js dashboard with template browsing, builder flow, deploy/test flows, API key management, analytics, and docs/editor surfaces.
+```bash
+cd api
+npm install
+cp .env.example .env   # fill in VERIFIER_SECRET_KEY and CONTRACT_ID
+npm run dev            # starts on port 3001
+```
 
-### Phase 6 — CLI Tool
+### 4. Dashboard
 
-Provide CLI commands for proof generation, verification, contract deployment, and template management.
+```bash
+cd dashboard
+npm install
+npm run dev            # starts on port 3000
+```
 
-### Phase 7 — Launch Templates
+Open `http://localhost:3000`
 
-Ship five end-to-end templates at launch:
+---
 
-1. Age 18+
-2. OFAC sanctions non-membership
-3. Accredited investor status
-4. Credit score range
-5. KYC completion at institution
+## API Endpoints
 
-### Phase 8 — Testing Strategy
+```
+POST /api/prove
+  Body: { proofType, walletAddress, data }
+  Returns: { success, publicSignals, txHash }
 
-Cover:
+GET  /api/verify/:wallet/:proofType
+  Returns: { wallet, proofType, verified }
 
-- Circuit witness/proof validation.
-- Soroban contract unit tests.
-- End-to-end flow from API proof generation to on-chain verification and SDK checks.
+GET  /api/circuits
+  Returns: { supported, count }
 
-### Phase 9 — Security Hardening
+GET  /api/health
+  Returns: { status, contractId, network, timestamp }
+```
 
-Key checklist:
+---
 
-- MPC-grade trusted setup for production.
-- No PII storage anywhere.
-- Proof/public-input binding integrity.
-- Sanctions root freshness strategy.
-- Contract audit before institutional rollout.
-- Strong API key and key-management boundaries.
+## Example: Age Proof
 
-### Phase 10 — Go-To-Market
+```bash
+curl -X POST http://localhost:3001/api/prove \
+  -H "Content-Type: application/json" \
+  -d '{
+    "proofType": "age_over_18",
+    "walletAddress": "GABC...XYZ",
+    "data": { "birthdate": "631152000" }
+  }'
 
-Developer adoption, anchor pilots, and enterprise monetization tiers.
+# Response
+{
+  "success": true,
+  "proofType": "age_over_18",
+  "publicSignals": ["1", "1783064111"],
+  "txHash": "5fa7b77293e73510847ec1691995122be417d5b74f77d11b6576b5ca16571496",
+  "message": "Proof verified and attested on Stellar testnet"
+}
+```
 
-## Reference Links
+---
 
-- Stellar Developers: https://stellar.org/developers
-- Soroban Docs: https://soroban.stellar.org
-- Circom Docs: https://docs.circom.io
-- SnarkJS: https://github.com/iden3/snarkjs
-- Circomlib: https://github.com/iden3/circomlib
-- BN254 reference (EIP-197): https://eips.ethereum.org/EIPS/eip-197
+## ZK Circuit Design
+
+All circuits use Groth16 over BN254. Private inputs are never revealed — only the proof and public outputs are shared.
+
+**Age verification circuit:**
+```circom
+template AgeOver18() {
+    signal input birthdate;     // private
+    signal input currentDate;   // public
+    signal output valid;
+
+    signal age;
+    age <== currentDate - birthdate;
+
+    component gte = GreaterEqThan(64);
+    gte.in[0] <== age;
+    gte.in[1] <== 568036800;  // 18 years in seconds
+
+    valid <== gte.out;
+}
+```
+
+---
+
+## Contract Verification
+
+View the deployed contract on Stellar Expert:
+
+[https://stellar.expert/explorer/testnet/contract/CDA7HN45XE3EDAJJZQ4HBYM5E6G6SYIJZJIRPKQSMBLTDQAAXNEK76VQ](https://stellar.expert/explorer/testnet/contract/CDA7HN45XE3EDAJJZQ4HBYM5E6G6SYIJZJIRPKQSMBLTDQAAXNEK76VQ)
+
+View the first proof attestation transaction:
+
+[https://stellar.expert/explorer/testnet/tx/5fa7b77293e73510847ec1691995122be417d5b74f77d11b6576b5ca16571496](https://stellar.expert/explorer/testnet/tx/5fa7b77293e73510847ec1691995122be417d5b74f77d11b6576b5ca16571496)
+
+---
+
+## License
+
+MIT
