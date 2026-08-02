@@ -1,7 +1,8 @@
 'use client';
+
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Shield } from 'lucide-react';
+import { ArrowUpRight, Lock } from 'lucide-react';
 import { PROOF_CARDS, COLOR_MAP } from '@/lib/proofConfig';
 import ProofModal from './ProofModal';
 import { ProofCard } from '@/types';
@@ -10,80 +11,58 @@ export default function ProofGrid() {
   const [selectedCard, setSelectedCard] = useState<ProofCard | null>(null);
 
   return (
-    <section id="proofs" className="py-24 px-6 relative">
-      <div className="max-w-7xl mx-auto">
-        {/* Section header */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="text-center mb-16"
-        >
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-stellar-purple/30 bg-stellar-purple/5 text-stellar-purple text-xs font-mono mb-4">
-            <Shield className="w-3 h-3" />
-            ZERO KNOWLEDGE PROOFS
+    <section id="proofs" className="border-b border-ink-800 px-5 py-24 sm:px-8 sm:py-32">
+      <div className="mx-auto max-w-6xl">
+        <motion.div initial={{ opacity: 0, y: 14 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="mb-12 flex flex-col justify-between gap-6 md:flex-row md:items-end">
+          <div>
+            <p className="coord-label">02 / Proof library</p>
+            <h2 className="mt-5 max-w-xl text-[clamp(2.3rem,5vw,4rem)] font-semibold leading-[1.02] text-spectral">Select a claim. Keep the evidence private.</h2>
           </div>
-          <h2 className="text-4xl md:text-5xl font-black text-white mb-4">
-            Choose Your <span className="text-transparent bg-clip-text bg-gradient-to-r from-stellar-purple to-stellar-cyan">Proof Type</span>
-          </h2>
-          <p className="text-stellar-muted max-w-xl mx-auto">
-            Select a compliance proof to generate. Your private data never leaves your browser.
-          </p>
+          <p className="max-w-xs text-sm leading-relaxed text-zinc-500">Six Circom circuits for common compliance requirements. Each card exposes the claim, not the data behind it.</p>
         </motion.div>
 
-        {/* Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {PROOF_CARDS.map((card, i) => {
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {PROOF_CARDS.map((card, index) => {
             const colors = COLOR_MAP[card.color];
             return (
-              <motion.div
+              <motion.button
+                type="button"
                 key={card.id}
-                initial={{ opacity: 0, y: 30 }}
+                initial={{ opacity: 0, y: 16 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ delay: i * 0.1 }}
+                transition={{ delay: index * .06 }}
                 onClick={() => setSelectedCard(card)}
-                className={`proof-card rounded-2xl p-6 cursor-pointer ${colors.border} ${colors.hover} ${colors.glow} transition-all duration-300`}
+                className={`group card text-left transition-all duration-200 hover:-translate-y-0.5 ${colors.border} ${colors.hover}`}
               >
-                {/* Icon + badge */}
-                <div className="flex items-start justify-between mb-4">
-                  <span className="text-4xl">{card.icon}</span>
-                  <span className={`text-xs font-mono px-2 py-1 rounded-full border ${colors.badge}`}>
-                    ZK PROOF
-                  </span>
+                <div className="flex items-start justify-between border-b border-ink-800 p-5">
+                  <span className={`font-mono text-2xl font-medium ${colors.icon}`}>{card.icon}</span>
+                  <span className={`badge border font-mono uppercase ${colors.badge}`}>Groth16</span>
                 </div>
-
-                {/* Content */}
-                <h3 className="text-lg font-bold text-white mb-2">{card.title}</h3>
-                <p className="text-sm text-stellar-muted leading-relaxed mb-4">{card.description}</p>
-
-                {/* Fields preview */}
-                <div className="space-y-1 mb-6">
-                  {card.fields.map(f => (
-                    <div key={f.key} className="flex items-center gap-2 text-xs text-stellar-muted font-mono">
-                      <div className={`w-1 h-1 rounded-full ${colors.icon.replace('text-', 'bg-')}`} />
-                      {f.label}
-                    </div>
-                  ))}
+                <div className="p-5">
+                  <div className="flex items-center gap-2">
+                    <h3 className="text-base font-semibold text-zinc-100">{card.title}</h3>
+                    <ArrowUpRight className="h-3.5 w-3.5 text-zinc-600 transition-colors group-hover:text-spectral" />
+                  </div>
+                  <p className="mt-2 min-h-[3rem] text-sm leading-relaxed text-zinc-500">{card.description}</p>
+                  <div className="mt-5 space-y-2 border-t border-ink-800 pt-4">
+                    {card.fields.map(field => (
+                      <div key={field.key} className="flex items-center gap-2 font-mono text-[10px] text-zinc-500">
+                        {field.visibility === 'private' ? <Lock className="h-3 w-3 text-zinc-600" /> : <span className="grid h-3 w-3 place-items-center text-[8px] text-patina-300">P</span>} {field.label}
+                      </div>
+                    ))}
+                  </div>
+                  <div className="mt-5 flex items-center justify-between border-t border-ink-800 pt-4">
+                    <span className="font-mono text-[9px] uppercase tracking-[.16em] text-zinc-600">Private + public inputs</span>
+                    <span className="text-xs font-medium text-zinc-400 transition-colors group-hover:text-spectral">Open module →</span>
+                  </div>
                 </div>
-
-                {/* CTA */}
-                <button className={`w-full py-3 rounded-xl text-sm font-semibold text-white transition-all ${colors.button}`}>
-                  Generate Proof →
-                </button>
-              </motion.div>
+              </motion.button>
             );
           })}
         </div>
       </div>
-
-      {/* Modal */}
-      {selectedCard && (
-        <ProofModal
-          card={selectedCard}
-          onClose={() => setSelectedCard(null)}
-        />
-      )}
+      {selectedCard && <ProofModal card={selectedCard} onClose={() => setSelectedCard(null)} />}
     </section>
   );
 }

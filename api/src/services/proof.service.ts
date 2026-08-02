@@ -57,6 +57,10 @@ export async function generateAndVerifyProof(
       return { success: false, error: 'proof verification failed' };
     }
 
+    if (publicSignals[0] !== '1') {
+      return { success: false, error: 'compliance requirement not satisfied' };
+    }
+
     return {
       success: true,
       proof,

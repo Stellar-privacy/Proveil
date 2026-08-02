@@ -1,51 +1,73 @@
 'use client';
-import { Shield, Zap, GitBranch } from 'lucide-react';
+
+import { useState } from 'react';
+import { GitBranch, Menu, Shield, X } from 'lucide-react';
+
+const LINKS = [
+  { label: 'Proofs', href: '#proofs' },
+  { label: 'Protocol', href: '#protocol' },
+  { label: 'Verify', href: '#verify' },
+  { label: 'SDK', href: 'https://github.com/Stellar-privacy/Proveil/tree/main/sdk' },
+];
 
 export default function NavBar() {
+  const [open, setOpen] = useState(false);
+
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 glass border-b border-stellar-border">
-      <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
-        {/* Logo */}
-        <div className="flex items-center gap-3">
-          <div className="relative">
-            <Shield className="w-8 h-8 text-stellar-purple" />
-            <div className="absolute inset-0 text-stellar-purple opacity-50 blur-sm">
-              <Shield className="w-8 h-8" />
-            </div>
-          </div>
-          <div>
-            <span className="text-xl font-bold text-white tracking-tight">
-              Pro<span className="text-stellar-purple glow-text">Veil</span>
-            </span>
-            <div className="text-[10px] text-stellar-muted font-mono tracking-widest uppercase">
-              ZK Compliance Protocol
-            </div>
-          </div>
+    <nav className="fixed inset-x-0 top-0 z-50 border-b border-ink-800 bg-ink-950/80 backdrop-blur-md">
+      <div className="mx-auto flex h-[68px] max-w-6xl items-center justify-between px-5 sm:px-8">
+        <a href="#top" className="flex items-center gap-2.5" aria-label="ProVeil home">
+          <span className="grid h-8 w-8 place-items-center rounded-full border border-spectral/25 bg-spectral/10">
+            <Shield className="h-4 w-4 text-spectral" strokeWidth={1.8} />
+          </span>
+          <span className="font-display text-[15px] font-semibold tracking-[-0.02em] text-spectral">PROVEIL</span>
+        </a>
+
+        <div className="hidden items-center gap-8 md:flex">
+          {LINKS.map(link => (
+            <a key={link.label} href={link.href} className="text-xs font-medium text-zinc-400 transition-colors hover:text-spectral">
+              {link.label}
+            </a>
+          ))}
         </div>
 
-        {/* Center status */}
-        <div className="hidden md:flex items-center gap-2 px-4 py-1.5 rounded-full border border-stellar-green/30 bg-stellar-green/5">
-          <div className="w-2 h-2 rounded-full bg-stellar-green animate-pulse" />
-          <span className="text-xs font-mono text-stellar-green">TESTNET LIVE</span>
-          <Zap className="w-3 h-3 text-stellar-green" />
-        </div>
-
-        {/* Right links */}
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2.5">
+          <div className="hidden items-center gap-2 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-3 py-1.5 sm:flex">
+            <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
+            <span className="font-mono text-[10px] tracking-[0.14em] text-emerald-300">TESTNET LIVE</span>
+          </div>
           <a
-            href="https://github.com/Stellar-P/Proveil"
+            href="https://github.com/Stellar-privacy/Proveil"
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-2 text-stellar-muted hover:text-white transition-colors text-sm"
+            className="btn-ghost grid h-9 w-9 place-items-center rounded-lg"
+            aria-label="View ProVeil on GitHub"
           >
-            <GitBranch className="w-4 h-4" />
-            <span className="hidden sm:inline">GitHub</span>
+            <GitBranch className="h-4 w-4" />
           </a>
-          <div className="text-xs font-mono text-stellar-muted border border-stellar-border rounded px-2 py-1">
-            Groth16 · BN254
-          </div>
+          <button
+            type="button"
+            className="btn-ghost grid h-9 w-9 place-items-center rounded-lg md:hidden"
+            onClick={() => setOpen(value => !value)}
+            aria-expanded={open}
+            aria-label="Toggle navigation"
+          >
+            {open ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
+          </button>
         </div>
       </div>
+
+      {open && (
+        <div className="border-t border-ink-800 bg-ink-950 px-5 py-4 md:hidden">
+          <div className="mx-auto flex max-w-6xl flex-col">
+            {LINKS.map(link => (
+              <a key={link.label} href={link.href} onClick={() => setOpen(false)} className="border-b border-ink-800 py-3 text-sm text-zinc-300 last:border-0">
+                {link.label}
+              </a>
+            ))}
+          </div>
+        </div>
+      )}
     </nav>
   );
 }

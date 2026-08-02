@@ -42,5 +42,6 @@ export interface ProofField {
   label: string;
   placeholder: string;
   type: 'text' | 'number' | 'date';
+  visibility: 'private' | 'public';
   hint?: string;
 }
