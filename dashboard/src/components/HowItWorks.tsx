@@ -1,87 +1,54 @@
 'use client';
+
 import { motion } from 'framer-motion';
-import { Lock, Cpu, CheckCircle, Globe } from 'lucide-react';
+import { Check, Cpu, Globe, Lock } from 'lucide-react';
 
 const STEPS = [
-  {
-    icon: Lock,
-    title: 'Enter Private Data',
-    description: 'Provide your sensitive data locally. It never leaves your browser or gets transmitted.',
-    color: 'text-stellar-purple',
-    bg: 'bg-stellar-purple/10',
-    border: 'border-stellar-purple/20',
-  },
-  {
-    icon: Cpu,
-    title: 'Generate ZK Proof',
-    description: 'A Groth16 circuit computes a cryptographic proof that your data satisfies the condition.',
-    color: 'text-stellar-cyan',
-    bg: 'bg-stellar-cyan/10',
-    border: 'border-stellar-cyan/20',
-  },
-  {
-    icon: CheckCircle,
-    title: 'Verify Locally',
-    description: 'The proof is verified using snarkjs before any blockchain interaction occurs.',
-    color: 'text-stellar-green',
-    bg: 'bg-stellar-green/10',
-    border: 'border-stellar-green/20',
-  },
-  {
-    icon: Globe,
-    title: 'Attest on Stellar',
-    description: 'The verified result is attested immutably on Stellar testnet via a Soroban smart contract.',
-    color: 'text-violet-400',
-    bg: 'bg-violet-500/10',
-    border: 'border-violet-500/20',
-  },
+  { number: '01', icon: Lock, title: 'Private evidence', description: 'Sensitive values are sent to the proof service, but excluded from public signals and the Stellar attestation.' },
+  { number: '02', icon: Cpu, title: 'Circuit execution', description: 'A Groth16 circuit evaluates the claim against the selected compliance requirement.' },
+  { number: '03', icon: Check, title: 'Proof verification', description: 'The proof and its compliance output are checked before any blockchain interaction. Invalid claims do not proceed.' },
+  { number: '04', icon: Globe, title: 'Stellar attestation', description: 'A verified result is recorded through Soroban with a 30-day validity window.' },
 ];
 
 export default function HowItWorks() {
   return (
-    <section className="py-24 px-6">
-      <div className="max-w-5xl mx-auto">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="text-center mb-16"
-        >
-          <h2 className="text-4xl font-black text-white mb-4">
-            How <span className="text-transparent bg-clip-text bg-gradient-to-r from-stellar-purple to-stellar-cyan">ProVeil</span> Works
+    <section id="protocol" className="border-b border-ink-800 px-5 py-24 sm:px-8 sm:py-32">
+      <div className="mx-auto grid max-w-6xl gap-12 md:grid-cols-[.75fr_1.25fr] md:gap-20">
+        <motion.div initial={{ opacity: 0, y: 14 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
+          <p className="coord-label">01 / Protocol</p>
+          <h2 className="mt-5 max-w-md text-[clamp(2.3rem,5vw,4rem)] font-semibold leading-[1.02] text-spectral">
+            From private input to public proof.
           </h2>
-          <p className="text-stellar-muted max-w-xl mx-auto">
-            A four-step pipeline from private input to immutable on-chain attestation.
+          <p className="mt-6 max-w-sm text-sm leading-relaxed text-zinc-500">
+            ProVeil separates the claim from the information that proves it. The network receives an attestation, not a profile.
           </p>
         </motion.div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {STEPS.map((step, i) => (
-            <motion.div
-              key={step.title}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: i * 0.1 }}
-              className={`relative p-6 rounded-2xl border ${step.border} ${step.bg}`}
-            >
-              {/* Step number */}
-              <div className="absolute -top-3 -left-3 w-7 h-7 rounded-full bg-stellar-dark border border-stellar-border flex items-center justify-center text-xs font-mono text-stellar-muted">
-                {i + 1}
-              </div>
-
-              {/* Arrow connector */}
-              {i < STEPS.length - 1 && (
-                <div className="hidden lg:block absolute top-1/2 -right-3 transform -translate-y-1/2 text-stellar-muted z-10">
-                  →
+        <div className="relative">
+          <div className="absolute bottom-8 left-[15px] top-8 w-px bg-gradient-to-b from-patina-400/70 via-ink-600 to-transparent" />
+          <div className="space-y-8">
+            {STEPS.map((step, index) => (
+              <motion.div
+                key={step.number}
+                initial={{ opacity: 0, x: 14 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: index * .08 }}
+                className="relative grid grid-cols-[32px_1fr] gap-5"
+              >
+                <div className="relative z-10 grid h-8 w-8 place-items-center rounded-full border border-ink-600 bg-ink-950 text-patina-300">
+                  <step.icon className="h-3.5 w-3.5" />
                 </div>
-              )}
-
-              <step.icon className={`w-8 h-8 ${step.color} mb-4`} />
-              <h3 className="font-bold text-white mb-2">{step.title}</h3>
-              <p className="text-sm text-stellar-muted leading-relaxed">{step.description}</p>
-            </motion.div>
-          ))}
+                <div className={`pb-8 ${index < STEPS.length - 1 ? 'border-b border-ink-800' : ''}`}>
+                  <div className="flex items-baseline gap-3">
+                    <span className="font-mono text-[10px] text-zinc-600">{step.number}</span>
+                    <h3 className="text-base font-semibold text-zinc-100">{step.title}</h3>
+                  </div>
+                  <p className="mt-2 max-w-lg text-sm leading-relaxed text-zinc-500">{step.description}</p>
+                </div>
+              </motion.div>
+            ))}
+          </div>
         </div>
       </div>
     </section>
