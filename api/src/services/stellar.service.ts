@@ -19,6 +19,7 @@ export interface AttestResult {
   success: boolean;
   txHash?: string;
   error?: string;
+  pending?: boolean;
 }
 
 export async function attestProofOnChain(
@@ -29,12 +30,6 @@ export async function attestProofOnChain(
   try {
     const verifierKeypair = Keypair.fromSecret(config.stellar.verifierSecretKey);
     const verifierAccount = await server.getAccount(verifierKeypair.publicKey());
-
-    // Build public signals as SCVal
-    const signalsVec = nativeToScVal(
-      publicSignals.map(s => s),
-      { type: 'string' }
-    );
 
     const walletScVal = new Address(walletAddress).toScVal();
     const proofTypeScVal = nativeToScVal(proofType, { type: 'string' });
@@ -78,17 +73,26 @@ export async function attestProofOnChain(
     // Poll for confirmation
     let getResult = await server.getTransaction(result.hash);
     let attempts = 0;
-    while (getResult.status === 'NOT_FOUND' && attempts < 20) {
-      await new Promise(r => setTimeout(r, 1500));
+    while (getResult.status === rpc.Api.GetTransactionStatus.NOT_FOUND && attempts < 40) {
+      await new Promise(r => setTimeout(r, 2000));
       getResult = await server.getTransaction(result.hash);
       attempts++;
     }
 
-    if (getResult.status === 'SUCCESS') {
+    if (getResult.status === rpc.Api.GetTransactionStatus.SUCCESS) {
       return { success: true, txHash: result.hash };
-    } else {
-      return { success: false, error: `tx status: ${getResult.status}` };
     }
+
+    if (getResult.status === rpc.Api.GetTransactionStatus.NOT_FOUND) {
+      return {
+        success: false,
+        pending: true,
+        txHash: result.hash,
+        error: 'transaction submitted but confirmation is still pending; check Stellar Expert before retrying',
+      };
+    }
+
+    return { success: false, error: 'transaction failed on Stellar testnet' };
   } catch (err: any) {
     return { success: false, error: err.message };
   }

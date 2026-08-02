@@ -20,6 +20,7 @@ export interface ProofResponse {
   txHash?: string;
   message?: string;
   error?: string;
+  pending?: boolean;
 }
 
 export interface VerifyResponse {

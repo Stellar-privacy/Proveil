@@ -48,7 +48,9 @@ export default function ProofModal({ card, onClose }: ProofModalProps) {
 
   const setField = (key: string, value: string) => setFieldValues(previous => ({ ...previous, [key]: value }));
   const setDate = (key: string, value: string) => setField(key, value ? String(Math.floor(new Date(value).getTime() / 1000)) : '');
-  const isFormValid = StrKey.isValidEd25519PublicKey(walletAddress) && card.fields.every(field => fieldValues[field.key]);
+  const walletIsValid = StrKey.isValidEd25519PublicKey(walletAddress);
+  const missingFields = card.fields.filter(field => !fieldValues[field.key]);
+  const isFormValid = walletIsValid && missingFields.length === 0;
 
   const submit = async () => {
     setStep('generating');
@@ -110,7 +112,11 @@ export default function ProofModal({ card, onClose }: ProofModalProps) {
           <div className="p-5 sm:p-6">
             {step === 'input' && (
               <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
-                <div><label className="label" htmlFor="proof-wallet">Stellar wallet address</label><input id="proof-wallet" type="text" value={walletAddress} onChange={event => setWalletAddress(event.target.value)} placeholder="GABC...XYZ (56 characters)" className="input input-mono" /></div>
+                 <div>
+                   <label className="label" htmlFor="proof-wallet">Stellar wallet address</label>
+                   <input id="proof-wallet" type="text" value={walletAddress} onChange={event => setWalletAddress(event.target.value.trim())} placeholder="GABC...XYZ (56 characters)" className="input input-mono" aria-describedby="proof-wallet-status" />
+                   <p id="proof-wallet-status" className={`mt-1.5 text-[11px] ${walletAddress && !walletIsValid ? 'text-red-300' : 'text-zinc-600'}`}>{walletAddress && !walletIsValid ? 'Enter a valid Stellar G-address with a valid checksum.' : 'The attestation will be bound to this Stellar account.'}</p>
+                 </div>
                  {(['private', 'public'] as const).map(visibility => {
                    const fields = card.fields.filter(field => field.visibility === visibility);
                    if (!fields.length) return null;
@@ -129,7 +135,10 @@ export default function ProofModal({ card, onClose }: ProofModalProps) {
                    );
                  })}
                  <div className="flex gap-3 rounded-xl border border-patina-500/20 bg-patina-500/10 p-3.5"><Shield className="mt-0.5 h-4 w-4 shrink-0 text-patina-300" /><p className="text-[11px] leading-relaxed text-zinc-400">Private evidence is sent to the proof service for computation. Public parameters become part of the proof signals and attestation context.</p></div>
-                <div className="flex items-center justify-between pt-2"><span className="font-mono text-[9px] uppercase tracking-[.14em] text-zinc-600">Estimated 15–30 seconds</span><button type="button" onClick={submit} disabled={!isFormValid} className="btn btn-primary px-5 py-3">Generate proof</button></div>
+                 <div className="pt-2">
+                   {!isFormValid && <p className="mb-3 text-[11px] text-amber-300/80">{!walletIsValid ? 'A valid Stellar wallet is required.' : `Complete ${missingFields.map(field => field.label).join(', ')}.`}</p>}
+                   <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"><span className="font-mono text-[9px] uppercase tracking-[.14em] text-zinc-600">Estimated 15–30 seconds</span><button type="button" onClick={submit} disabled={!isFormValid} className="btn btn-primary px-5 py-3">Generate proof</button></div>
+                 </div>
               </motion.div>
             )}
 
@@ -153,7 +162,13 @@ export default function ProofModal({ card, onClose }: ProofModalProps) {
             )}
 
             {step === 'error' && result && (
-              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="py-5 text-center"><AlertCircle className="mx-auto h-10 w-10 text-red-300" /><p className="mt-3 font-display font-semibold text-zinc-100">Proof generation failed</p><p className="mx-auto mt-2 max-w-sm text-xs leading-relaxed text-red-300">{result.error}</p><button type="button" onClick={() => setStep('input')} className="btn btn-primary mt-6">Return to inputs</button></motion.div>
+                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="py-5 text-center">
+                  <AlertCircle className="mx-auto h-10 w-10 text-amber-300" />
+                  <p className="mt-3 font-display font-semibold text-zinc-100">{result.pending ? 'Attestation is still pending' : 'Proof generation failed'}</p>
+                  <p className="mx-auto mt-2 max-w-sm text-xs leading-relaxed text-amber-200/80">{result.error}</p>
+                  {result.txHash && <a href={`https://stellar.expert/explorer/testnet/tx/${result.txHash}`} target="_blank" rel="noopener noreferrer" className="mt-4 inline-flex items-center gap-2 font-mono text-[10px] text-patina-300 hover:underline">Open transaction status <ExternalLink className="h-3 w-3" /></a>}
+                  <button type="button" onClick={() => setStep('input')} className="btn btn-primary mt-6">Return to inputs</button>
+                </motion.div>
             )}
           </div>
         </motion.div>
