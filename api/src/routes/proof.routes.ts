@@ -36,6 +36,8 @@ router.post('/prove', validateProofRequest, async (req: Request, res: Response) 
       res.status(500).json({
         success: false,
         error: `on-chain attestation failed: ${attestResult.error}`,
+        txHash: attestResult.txHash,
+        pending: attestResult.pending,
       });
       return;
     }

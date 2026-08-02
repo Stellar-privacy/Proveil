@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
+import { StrKey } from '@stellar/stellar-sdk';
 import { config } from '../config';
 
 export function validateProofRequest(
@@ -25,7 +26,7 @@ export function validateProofRequest(
     return;
   }
 
-  if (!walletAddress.startsWith('G') || walletAddress.length !== 56) {
+  if (typeof walletAddress !== 'string' || !StrKey.isValidEd25519PublicKey(walletAddress)) {
     res.status(400).json({ error: 'invalid Stellar walletAddress' });
     return;
   }
