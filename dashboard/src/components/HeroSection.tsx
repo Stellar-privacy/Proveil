@@ -1,112 +1,69 @@
 'use client';
+
 import { motion } from 'framer-motion';
-import { Lock, Shield, Zap } from 'lucide-react';
+import { ArrowDownRight, ArrowRight, Check } from 'lucide-react';
+import ProofTranscript from './ProofTranscript';
 
 export default function HeroSection() {
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-16">
-      {/* Background layers */}
-      <div className="absolute inset-0 bg-grid-pattern opacity-30" />
-      <div className="absolute inset-0 bg-glow-purple" />
-      <div className="absolute inset-0 bg-glow-cyan" />
+    <section id="top" className="relative overflow-hidden border-b border-ink-800 px-5 pb-20 pt-36 sm:px-8 sm:pb-28 sm:pt-44">
+      <div className="pointer-events-none absolute left-[8%] top-24 h-[28rem] w-[28rem] rounded-full bg-spectral/[0.035] blur-3xl" />
+      <div className="mx-auto grid max-w-6xl items-center gap-14 md:grid-cols-[1.05fr_.95fr] md:gap-16">
+        <div>
+          <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="mb-9 flex items-center gap-3">
+            <span className="coord-label">Protocol / Stellar Testnet</span>
+            <span className="h-px w-10 bg-ink-600" />
+            <span className="font-mono text-[10px] text-patina-300">ZK-01</span>
+          </motion.div>
 
-      {/* Floating orbs */}
-      <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-stellar-purple/5 rounded-full blur-3xl animate-pulse-slow" />
-      <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-stellar-cyan/5 rounded-full blur-3xl animate-pulse-slow" style={{ animationDelay: '1.5s' }} />
-
-      <div className="relative z-10 max-w-5xl mx-auto px-6 text-center">
-        {/* Badge */}
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-stellar-purple/40 bg-stellar-purple/10 text-stellar-purple text-sm font-mono mb-8"
-        >
-          <div className="w-2 h-2 rounded-full bg-stellar-purple animate-pulse" />
-          Powered by Stellar Protocol · Groth16 ZK Proofs
-          <Zap className="w-3 h-3" />
-        </motion.div>
-
-        {/* Main heading */}
-        <motion.h1
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 0.1 }}
-          className="text-6xl md:text-8xl font-black tracking-tight mb-6"
-        >
-          <span className="text-white">Privacy</span>
-          <br />
-          <span className="text-transparent bg-clip-text bg-gradient-to-r from-stellar-purple via-violet-400 to-stellar-cyan">
-            Without Compromise
-          </span>
-        </motion.h1>
-
-        {/* Subheading */}
-        <motion.p
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 0.2 }}
-          className="text-lg md:text-xl text-stellar-muted max-w-2xl mx-auto mb-12 leading-relaxed"
-        >
-          Generate zero-knowledge proofs for KYC compliance and attest them
-          immutably on Stellar. Prove what you need to prove — nothing more.
-        </motion.p>
-
-        {/* Stats row */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 0.3 }}
-          className="flex flex-wrap justify-center gap-8 mb-12"
-        >
-          {[
-            { label: 'Proof Types', value: '6', icon: Shield },
-            { label: 'ZK Circuit', value: 'Groth16', icon: Lock },
-            { label: 'On-Chain', value: 'Stellar', icon: Zap },
-            { label: 'Privacy', value: '100%', icon: Shield },
-          ].map((stat) => (
-            <div key={stat.label} className="text-center">
-              <div className="text-3xl font-black text-white mb-1">{stat.value}</div>
-              <div className="text-xs text-stellar-muted font-mono uppercase tracking-wider">{stat.label}</div>
-            </div>
-          ))}
-        </motion.div>
-
-        {/* CTA */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 0.4 }}
-          className="flex flex-wrap justify-center gap-4"
-        >
-          <a
-            href="#proofs"
-            className="px-8 py-4 bg-stellar-purple hover:bg-purple-600 text-white font-semibold rounded-xl transition-all duration-300 hover:shadow-[0_0_30px_rgba(123,47,255,0.5)] flex items-center gap-2"
+          <motion.h1
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: .65, delay: .05 }}
+            className="display-hd text-[clamp(3.1rem,7.5vw,6.5rem)]"
           >
-            <Shield className="w-5 h-5" />
-            Generate a Proof
-          </a>
-          <a
-            href="#verify"
-            className="px-8 py-4 border border-stellar-border hover:border-stellar-purple/50 text-stellar-text rounded-xl transition-all duration-300 hover:bg-stellar-purple/5"
-          >
-            Verify On-Chain
-          </a>
-        </motion.div>
+            Compliance<br />proven.<br />
+            <span className="text-spectral/45">Identity concealed.</span>
+          </motion.h1>
 
-        {/* Contract ID */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 1, delay: 0.6 }}
-          className="mt-12 inline-flex items-center gap-3 px-4 py-2 rounded-lg bg-stellar-card border border-stellar-border"
-        >
-          <div className="w-2 h-2 rounded-full bg-stellar-green" />
-          <span className="text-xs text-stellar-muted font-mono">Contract:</span>
-          <span className="text-xs font-mono text-stellar-text truncate max-w-xs">
-            CDA7HN45XE3EDAJJZQ4HBYM5E6G6SYIJZJIRPKQSMBLTDQAAXNEK76VQ
-          </span>
-        </motion.div>
+          <motion.p
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: .6, delay: .12 }}
+            className="mt-8 max-w-lg text-[15px] leading-relaxed text-zinc-400 sm:text-base"
+          >
+            Generate cryptographic compliance attestations without publishing the personal data behind them. ProVeil binds zero-knowledge proofs to Stellar wallets through Soroban.
+          </motion.p>
+
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: .6, delay: .18 }}
+            className="mt-9 flex flex-wrap gap-3"
+          >
+            <a href="#proofs" className="btn btn-primary px-5 py-3">
+              Generate proof <ArrowRight className="h-4 w-4" />
+            </a>
+            <a href="#verify" className="btn btn-outline px-5 py-3">
+              Query attestation <ArrowDownRight className="h-4 w-4" />
+            </a>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: .32 }}
+            className="mt-10 flex flex-wrap gap-x-6 gap-y-2"
+          >
+            {['6 production circuits', '30-day attestations', 'Public audit trail'].map(item => (
+              <span key={item} className="flex items-center gap-2 text-[11px] text-zinc-500">
+                <Check className="h-3 w-3 text-patina-300" /> {item}
+              </span>
+            ))}
+          </motion.div>
+        </div>
+
+        <ProofTranscript />
       </div>
     </section>
   );
