@@ -143,7 +143,7 @@ export default function ProofModal({ card, onClose }: ProofModalProps) {
             )}
 
             {step === 'generating' && (
-              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="py-10">
+              <motion.div role="status" aria-live="polite" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="py-10">
                 <div className="mx-auto grid h-14 w-14 place-items-center rounded-full border border-patina-500/30 bg-patina-500/10"><Loader2 className="h-6 w-6 animate-spin text-patina-300" /></div>
                 <div className="mt-5 text-center"><p className="font-display text-lg font-semibold text-zinc-100">Constructing proof</p><p className="mt-1 text-xs text-zinc-500">Witness generation and verification are in progress.</p></div>
                 <div className="mx-auto mt-8 max-w-sm space-y-2">
