@@ -42,5 +42,9 @@ Thumbs.db
 *.log
 npm-debug.log*
 
+# Playwright artifacts
+dashboard/playwright-report/
+dashboard/test-results/
+
 # Lock files in subdirectories
 circuits/package-lock.json
